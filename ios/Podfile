@@ -29,6 +29,8 @@ flutter_ios_podfile_setup
 
 target 'Runner' do
   use_frameworks!
+  # ML Kit가 요구하는 GTMSessionFetcher/Core(<4.0)와 Firebase(>=3.4 <6)의 교집합을 강제로 지정
+  pod 'GTMSessionFetcher/Core', '~> 3.4'
 
   flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
   target 'RunnerTests' do
