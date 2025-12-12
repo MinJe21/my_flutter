@@ -43,7 +43,6 @@ class AiService {
     ''';
 
     try {
-      // 3. AI에게 요청
       final response = await model.generateContent([Content.text(prompt)]);
       
       final rawText = response.text;

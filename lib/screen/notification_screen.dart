@@ -5,7 +5,6 @@ class NotificationScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // 임시 알림 데이터
     final List<Map<String, String>> notifications = [
       {'title': '목표 달성 축하!', 'time': '방금 전', 'content': '이번 달 목표 금액을 훌륭하게 지키고 계시네요! 🎉'},
       {'title': '지출 경고', 'time': '2시간 전', 'content': '식비 카테고리 예산이 80% 소진되었습니다.'},
@@ -46,7 +45,6 @@ class NotificationScreen extends StatelessWidget {
               style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 12),
             ),
             onTap: () {
-              // 알림 클릭 시 동작 (나중에 구현)
             },
           );
         },

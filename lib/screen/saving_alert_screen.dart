@@ -104,12 +104,10 @@ class _SavingAlertScreenState extends State<SavingAlertScreen> {
                     
                     const SizedBox(height: 30),
 
-                    // === AI 분석 결과 ===
                     FutureBuilder<Map<String, String>>(
                       future: _aiFeedbackFuture,
                       builder: (context, snapshot) {
                         if (snapshot.connectionState == ConnectionState.waiting) {
-                          // [1] 텍스트 로딩 중일 때
                           return _buildLoadingBox("AI가 가계부를 분석하고 있어요...");
                         } else if (snapshot.hasError) {
                           return const Text("분석 실패");
@@ -118,8 +116,6 @@ class _SavingAlertScreenState extends State<SavingAlertScreen> {
                         final comment = snapshot.data!['comment'] ?? "";
                         final keyword = snapshot.data!['keyword'] ?? "gift";
                         
-                        // [2] 이미지 URL 최적화 (사이즈 줄여서 속도 향상)
-                        // width=512, height=512, nologo=true 옵션 추가
                         final imageUrl = "https://image.pollinations.ai/prompt/$keyword?width=512&height=512&nologo=true";
 
                         return Container(
@@ -132,15 +128,13 @@ class _SavingAlertScreenState extends State<SavingAlertScreen> {
                           ),
                           child: Column(
                             children: [
-                              // [3] 이미지 로딩 UI 개선
                               ClipRRect(
                                 borderRadius: BorderRadius.circular(16),
                                 child: Image.network(
                                   imageUrl,
-                                  height: 250, // 이미지 키움
+                                  height: 250,
                                   width: double.infinity,
                                   fit: BoxFit.cover,
-                                  // 로딩 중일 때 보여줄 화면
                                   loadingBuilder: (context, child, loadingProgress) {
                                     if (loadingProgress == null) return child;
                                     return Container(
@@ -192,7 +186,6 @@ class _SavingAlertScreenState extends State<SavingAlertScreen> {
                     ),
 
                     const SizedBox(height: 40),
-                    // 진행률 바
                     const Align(alignment: Alignment.centerLeft, child: Text("예산 사용률", style: TextStyle(fontWeight: FontWeight.bold))),
                     const SizedBox(height: 10),
                     LinearProgressIndicator(
@@ -231,7 +224,6 @@ class _SavingAlertScreenState extends State<SavingAlertScreen> {
     );
   }
 
-  // 로딩 박스 위젯
   Widget _buildLoadingBox(String text) {
     return Container(
       height: 200,

@@ -1,8 +1,8 @@
-import 'dart:io'; // 파일 처리를 위해 추가
+import 'dart:io'; 
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart'; // 사진 업로드용
+import 'package:firebase_storage/firebase_storage.dart'; 
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AppState extends ChangeNotifier {
@@ -11,7 +11,6 @@ class AppState extends ChangeNotifier {
   bool _isDarkMode = false;
   bool get isDarkMode => _isDarkMode;
 
-  // 현재 선택된 날짜 (기본값: 오늘)
   DateTime _selectedDate = DateTime.now();
   DateTime get selectedDate => _selectedDate;
 
@@ -23,7 +22,6 @@ class AppState extends ChangeNotifier {
     _loadTheme();
   }
 
-  // --- 테마 모드 ---
   Future<void> _loadTheme() async {
     final prefs = await SharedPreferences.getInstance();
     _isDarkMode = prefs.getBool('isDarkMode') ?? false;
@@ -37,17 +35,12 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
-  // --- 날짜 관련 기능 ---
-
-  // 달 이동 시 날짜 유지 로직 (예: 11/29 -> 12/29)
   void changeMonth(int offset) {
     int newYear = _selectedDate.year;
     int newMonth = _selectedDate.month + offset;
     
-    // 이동하려는 달의 마지막 날짜 구하기 (예: 2월은 28일)
     int lastDayOfNewMonth = DateTime(newYear, newMonth + 1, 0).day;
     
-    // 현재 일(day)이 그 달의 마지막 날보다 크면 마지막 날로 조정
     int newDay = _selectedDate.day;
     if (newDay > lastDayOfNewMonth) {
       newDay = lastDayOfNewMonth;
@@ -57,13 +50,15 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
-  // 오늘 날짜로 복귀
   void resetToToday() {
     _selectedDate = DateTime.now();
     notifyListeners();
   }
 
-  // --- 인증 및 계정 관리 기능 ---
+  void setSelectedDate(DateTime date) {
+    _selectedDate = date;
+    notifyListeners();
+  }
 
   Future<void> signIn(String email, String password, Function(String) onError, [Function()? onSuccess]) async {
     try {
@@ -87,7 +82,6 @@ class AppState extends ChangeNotifier {
     await FirebaseAuth.instance.signOut();
   }
 
-  // [추가됨] 프로필 정보 업데이트 (직업, 사진 등)
   Future<void> updateProfile({String? job, File? imageFile, Function(String)? onError}) async {
     final user = _user;
     if (user == null) return;
@@ -95,19 +89,16 @@ class AppState extends ChangeNotifier {
     try {
       String? photoUrl;
 
-      // 1. 이미지가 있으면 Firebase Storage에 업로드
       if (imageFile != null) {
-        // 파일 경로: profile_images/{uid}.jpg
         final ref = FirebaseStorage.instance
             .ref()
             .child('profile_images')
             .child('${user.uid}.jpg');
         
-        await ref.putFile(imageFile); // 파일 업로드
-        photoUrl = await ref.getDownloadURL(); // 다운로드 가능한 URL 받기
+        await ref.putFile(imageFile); 
+        photoUrl = await ref.getDownloadURL(); 
       }
 
-      // 2. Firestore 'users' 컬렉션에 정보 저장
       Map<String, dynamic> data = {};
       if (job != null) data['job'] = job;
       if (photoUrl != null) data['photoUrl'] = photoUrl;
@@ -115,7 +106,7 @@ class AppState extends ChangeNotifier {
       if (data.isNotEmpty) {
         await FirebaseFirestore.instance.collection('users').doc(user.uid).set(
           data, 
-          SetOptions(merge: true), // 기존 데이터(목표 금액 등) 유지하면서 업데이트
+          SetOptions(merge: true), 
         );
       }
       
@@ -125,7 +116,6 @@ class AppState extends ChangeNotifier {
     }
   }
 
-  // [추가됨] 비밀번호 변경
   Future<void> changePassword(String newPassword, Function(String) onSuccess, Function(String) onError) async {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return;
@@ -144,11 +134,9 @@ class AppState extends ChangeNotifier {
     }
   }
 
-  // --- 지출 및 예산 관리 기능 ---
-
-  Future<void> addExpense(int amount, String category, String note, DateTime date, Function() onSuccess) async {
+  Future<bool> addExpense(int amount, String category, String note, DateTime date, Function() onSuccess) async {
     final user = _user;
-    if (user == null) return;
+    if (user == null) return false;
     try {
       await FirebaseFirestore.instance.collection('expenses').add({
         'uid': user.uid,
@@ -160,8 +148,10 @@ class AppState extends ChangeNotifier {
       });
       onSuccess();
       notifyListeners();
+      return true;
     } catch (e) {
       print("저장 실패: $e");
+      return false;
     }
   }
 

@@ -60,7 +60,6 @@ class _StatScreenState extends State<StatScreen> {
             double percent = monthlyGoal == 0 ? 0 : (totalSpent / monthlyGoal * 100);
             if (percent > 100) percent = 100;
 
-            // 그래프 Y축 최대값 계산
             double maxY = 1000;
             if (categoryStats.isNotEmpty) {
               maxY = categoryStats.values.reduce((a, b) => a > b ? a : b).toDouble() * 1.2;
@@ -76,7 +75,6 @@ class _StatScreenState extends State<StatScreen> {
                     const Text("이번달 예산 사용률", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 20),
                     
-                    // 1. 원형 차트 (Pie Chart)
                     SizedBox(
                       height: 200,
                       child: Stack(
@@ -131,7 +129,6 @@ class _StatScreenState extends State<StatScreen> {
                     Divider(color: Colors.grey[300]),
                     const SizedBox(height: 30),
 
-                    // 2. 막대 차트 (Bar Chart) - 디자인 개선됨
                     const Text("카테고리별 지출 비교", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 30),
                     
@@ -148,7 +145,7 @@ class _StatScreenState extends State<StatScreen> {
                             alignment: BarChartAlignment.spaceAround,
                             maxY: maxY,
                             
-                            // [A] 터치 툴팁 디자인
+
                             barTouchData: BarTouchData(
                               enabled: true,
                               touchTooltipData: BarTouchTooltipData(
@@ -171,13 +168,13 @@ class _StatScreenState extends State<StatScreen> {
                               ),
                             ),
                             
-                            // [B] 축 타이틀 (하단 글씨)
+
                             titlesData: FlTitlesData(
                               show: true,
                               bottomTitles: AxisTitles(
                                 sideTitles: SideTitles(
                                   showTitles: true,
-                                  reservedSize: 40, // 공간 확보로 겹침 방지
+                                  reservedSize: 40, 
                                   getTitlesWidget: (double value, TitleMeta meta) {
                                     if (value.toInt() >= categoryStats.length) return const SizedBox.shrink();
                                     
@@ -203,7 +200,6 @@ class _StatScreenState extends State<StatScreen> {
                               rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
                             ),
                             
-                            // [C] 배경 격자선 (점선)
                             gridData: FlGridData(
                               show: true,
                               drawVerticalLine: false,
@@ -217,7 +213,6 @@ class _StatScreenState extends State<StatScreen> {
                               },
                             ),
                             
-                            // [D] 테두리 (바닥선만)
                             borderData: FlBorderData(
                               show: true,
                               border: Border(
@@ -225,7 +220,6 @@ class _StatScreenState extends State<StatScreen> {
                               ),
                             ),
                             
-                            // [E] 막대 데이터 (그라데이션 & 둥근 모서리)
                             barGroups: categoryStats.entries.toList().asMap().entries.map((entry) {
                               int index = entry.key;
                               int amount = entry.value.value;
@@ -235,7 +229,6 @@ class _StatScreenState extends State<StatScreen> {
                                 barRods: [
                                   BarChartRodData(
                                     toY: amount.toDouble(),
-                                    // 그라데이션 적용
                                     gradient: LinearGradient(
                                       colors: [
                                         _getCategoryColor(context, index).withOpacity(0.6),
@@ -244,8 +237,8 @@ class _StatScreenState extends State<StatScreen> {
                                       begin: Alignment.bottomCenter,
                                       end: Alignment.topCenter,
                                     ),
-                                    width: 24, // 두께 증가
-                                    borderRadius: const BorderRadius.vertical(top: Radius.circular(6)), // 둥근 모서리
+                                    width: 24, 
+                                    borderRadius: const BorderRadius.vertical(top: Radius.circular(6)),
                                   ),
                                 ],
                               );
@@ -263,15 +256,15 @@ class _StatScreenState extends State<StatScreen> {
     );
   }
 
-  // 색상 팔레트
+
   Color _getCategoryColor(BuildContext context, int index) {
     final Color primary = Theme.of(context).colorScheme.primary;
     List<Color> colors = [
       primary,
-      const Color(0xFF8D99AE), // muted blue gray
-      const Color(0xFFB3B7BD), // light gray
-      const Color(0xFF74828F), // slate
-      const Color(0xFF566573), // deep gray
+      const Color(0xFF8D99AE), 
+      const Color(0xFFB3B7BD), 
+      const Color(0xFF74828F), 
+      const Color(0xFF566573), 
     ];
     return colors[index % colors.length];
   }

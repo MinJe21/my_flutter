@@ -89,7 +89,7 @@ class _SignupScreenState extends State<SignupScreen> {
                   border: OutlineInputBorder(),
                   prefixIcon: Icon(Icons.check_circle_outlined),
                 ),
-                obscureText: true, // 글자 가리기
+                obscureText: true,
                 validator: (value) {
                   if (value != _passwordController.text) return '비밀번호가 일치하지 않습니다.';
                   return null;

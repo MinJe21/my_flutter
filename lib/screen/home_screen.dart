@@ -4,10 +4,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
 import '../state/app_state.dart';
-import 'saving_alert_screen.dart'; // AI 리포트
-import 'profile_screen.dart';      // 프로필
-import 'notification_screen.dart'; // 알림
-import 'setting_screen.dart';      // 설정
+import 'saving_alert_screen.dart'; 
+import 'profile_screen.dart';      
+import 'notification_screen.dart'; 
+import 'setting_screen.dart';     
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -21,31 +21,26 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
     
-    // AppState에서 현재 보고 있는 날짜 가져오기
     final appState = context.watch<AppState>();
     final DateTime selectedDate = appState.selectedDate;
 
-    // [1단계] 유저 정보(목표 금액, 프로필 사진) 가져오기
     return StreamBuilder<DocumentSnapshot>(
       stream: FirebaseFirestore.instance.collection('users').doc(user?.uid).snapshots(),
       builder: (context, userSnapshot) {
         
         int monthlyGoal = 500000;
-        String? photoUrl; // 프로필 사진 URL 변수 추가
+        String? photoUrl; 
 
         if (userSnapshot.hasData && userSnapshot.data != null && userSnapshot.data!.exists) {
            final userData = userSnapshot.data!.data() as Map<String, dynamic>;
-           // 목표 금액 가져오기
            if (userData.containsKey('monthly_goal')) {
              monthlyGoal = userData['monthly_goal']; 
            }
-           // [추가됨] 프로필 사진 URL 가져오기
            if (userData.containsKey('photoUrl')) {
              photoUrl = userData['photoUrl'];
            }
         }
 
-        // [2단계] 내 지출 내역 가져오기
         return StreamBuilder<QuerySnapshot>(
           stream: FirebaseFirestore.instance
               .collection('expenses')
@@ -100,23 +95,19 @@ class _HomeScreenState extends State<HomeScreen> {
             return Scaffold(
               backgroundColor: Theme.of(context).colorScheme.background,
               
-              // [1] 상단 앱바
               appBar: AppBar(
                 backgroundColor: Theme.of(context).colorScheme.background,
                 elevation: 0,
                 centerTitle: true,
                 foregroundColor: Theme.of(context).colorScheme.onBackground,
                 
-                // ▼▼▼ [수정됨] 왼쪽 프로필 사진 (photoUrl 연결) ▼▼▼
                 leading: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: GestureDetector(
                     onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const ProfileScreen())),
                     child: CircleAvatar(
                       backgroundColor: Theme.of(context).colorScheme.primary,
-                      // 사진이 있으면 사진을, 없으면 null(색상)
                       backgroundImage: photoUrl != null ? NetworkImage(photoUrl) : null,
-                      // 사진이 없을 때만 글자(이니셜) 표시
                       child: photoUrl == null 
                           ? Text(
                               user?.email?.substring(0, 1).toUpperCase() ?? 'U',
@@ -126,9 +117,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                 ),
-                // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
 
-                // 가운데: 타이틀
                 title: Text(
                   "홈",
                   style: TextStyle(
@@ -137,7 +126,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
 
-                // 오른쪽: 기능 버튼들
                 actions: [
                   IconButton(
                     icon: Icon(Icons.card_giftcard, color: Theme.of(context).colorScheme.primary),
@@ -162,24 +150,19 @@ class _HomeScreenState extends State<HomeScreen> {
                     children: [
                       const SizedBox(height: 10),
 
-                      // [2] 날짜 헤더 (photoUrl 인자는 더 이상 필요 없음, 앱바에서 처리함)
                       _buildDateHeader(context, selectedDate), 
                       
                       const SizedBox(height: 20),
 
-                      // 1. 주간 날짜
                       _buildWeekRow(selectedDate, nowReal),
                       const SizedBox(height: 30),
 
-                      // 2. 오늘의 예산 카드
                       _buildTodayCard(todaySpent, (monthlyGoal / 30).round()),
                       const SizedBox(height: 20),
 
-                      // 3. 이번달 현황
                       _buildMonthlyStatus(monthlySpent, monthlyGoal),
                       const SizedBox(height: 30),
 
-                      // 4. Top 3 헤더
                       Align(
                         alignment: Alignment.centerLeft,
                         child: Text(
@@ -194,7 +177,6 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       const SizedBox(height: 10),
 
-                      // 5. Top 3 리스트
                       if (top3.isEmpty)
                         Padding(
                           padding: const EdgeInsets.all(20.0),
@@ -221,8 +203,6 @@ class _HomeScreenState extends State<HomeScreen> {
       }
     );
   }
-
-  // --- 위젯 함수들 ---
 
   Widget _buildDateHeader(BuildContext context, DateTime date) {
     return Row(

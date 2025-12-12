@@ -38,12 +38,10 @@ class _ExpenseDetailScreenState extends State<ExpenseDetailScreen> {
 
           final docs = snapshot.data!.docs;
 
-          // 날짜별로 지출 내역 그룹화 (달력에 점 찍기용)
           Map<DateTime, List<dynamic>> events = {};
           for (var doc in docs) {
             final data = doc.data() as Map<String, dynamic>;
             final DateTime date = (data['date'] as Timestamp).toDate();
-            // 시간 정보 날리고 날짜만 키로 사용
             final dateKey = DateTime(date.year, date.month, date.day);
             if (events[dateKey] == null) events[dateKey] = [];
             events[dateKey]!.add(data);
@@ -51,24 +49,20 @@ class _ExpenseDetailScreenState extends State<ExpenseDetailScreen> {
 
           return Column(
             children: [
-              // 1. 캘린더 위젯
               TableCalendar(
                 firstDay: DateTime.utc(2020, 1, 1),
                 lastDay: DateTime.utc(2030, 12, 31),
                 focusedDay: _focusedDay,
                 selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
                 
-                // 날짜 클릭 시 이벤트
                 onDaySelected: (selectedDay, focusedDay) {
                   setState(() {
                     _selectedDay = selectedDay;
                     _focusedDay = focusedDay;
                   });
-                  // 클릭하자마자 하단 모달 띄우기
                   _showExpenseModal(context, selectedDay, docs);
                 },
                 
-                // 달력 스타일 꾸미기
                 calendarStyle: CalendarStyle(
                   todayDecoration: BoxDecoration(color: Theme.of(context).colorScheme.primary, shape: BoxShape.circle),
                   selectedDecoration: BoxDecoration(color: Theme.of(context).colorScheme.primary.withOpacity(0.7), shape: BoxShape.circle),
@@ -79,7 +73,6 @@ class _ExpenseDetailScreenState extends State<ExpenseDetailScreen> {
                   titleCentered: true,
                 ),
                 
-                // 점 찍기 (지출 있는 날 표시)
                 eventLoader: (day) {
                   final dateKey = DateTime(day.year, day.month, day.day);
                   return events[dateKey] ?? [];
@@ -94,9 +87,7 @@ class _ExpenseDetailScreenState extends State<ExpenseDetailScreen> {
     );
   }
 
-  // === 2. 날짜 클릭 시 뜨는 모달 (지출 리스트) ===
   void _showExpenseModal(BuildContext context, DateTime date, List<QueryDocumentSnapshot> allDocs) {
-    // 선택된 날짜의 데이터만 필터링
     final dayDocs = allDocs.where((doc) {
       final d = (doc['date'] as Timestamp).toDate();
       return d.year == date.year && d.month == date.month && d.day == date.day;
@@ -104,16 +95,15 @@ class _ExpenseDetailScreenState extends State<ExpenseDetailScreen> {
 
     showModalBottomSheet(
       context: context,
-      isScrollControlled: true, // 화면 반 이상 올라오게
+      isScrollControlled: true, 
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
       builder: (context) {
         return Container(
           padding: const EdgeInsets.all(24),
-          height: MediaQuery.of(context).size.height * 0.5, // 화면 절반 높이
+          height: MediaQuery.of(context).size.height * 0.5, 
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // 날짜 헤더
               Center(
                 child: Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(10))),
               ),
@@ -124,7 +114,6 @@ class _ExpenseDetailScreenState extends State<ExpenseDetailScreen> {
               ),
               const SizedBox(height: 16),
 
-              // 지출 리스트
               Expanded(
                 child: dayDocs.isEmpty
                     ? const Center(child: Text("지출 내역이 없습니다."))
@@ -154,12 +143,11 @@ class _ExpenseDetailScreenState extends State<ExpenseDetailScreen> {
                                   Text('${NumberFormat('#,###').format(data['amount'])}원',
                                       style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                                   const SizedBox(width: 8),
-                                  // 수정 버튼 (연필 아이콘)
                                   IconButton(
                                     icon: const Icon(Icons.edit, size: 20, color: Colors.grey),
                                     onPressed: () {
-                                      Navigator.pop(context); // 리스트 닫고
-                                      _showEditDialog(context, doc.id, data); // 수정창 열기
+                                      Navigator.pop(context); 
+                                      _showEditDialog(context, doc.id, data); 
                                     },
                                   ),
                                 ],
@@ -176,7 +164,6 @@ class _ExpenseDetailScreenState extends State<ExpenseDetailScreen> {
     );
   }
 
-  // === 3. 수정하기 모달 (입력창) ===
   void _showEditDialog(BuildContext context, String docId, Map<String, dynamic> data) {
     final amountCtrl = TextEditingController(text: data['amount'].toString());
     final categoryCtrl = TextEditingController(text: data['category']);
@@ -205,7 +192,6 @@ class _ExpenseDetailScreenState extends State<ExpenseDetailScreen> {
           ],
         ),
         actions: [
-          // 삭제 버튼
           TextButton(
             onPressed: () {
               context.read<AppState>().deleteExpense(docId);
@@ -214,7 +200,6 @@ class _ExpenseDetailScreenState extends State<ExpenseDetailScreen> {
             },
             child: const Text("삭제", style: TextStyle(color: Colors.red)),
           ),
-          // 수정 완료 버튼
           ElevatedButton(
             onPressed: () {
               context.read<AppState>().updateExpense(

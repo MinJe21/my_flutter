@@ -1,15 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
-
-// 화면들 임포트
 import 'home_screen.dart';
 import 'add_expense_screen.dart';
 import 'budget_screen.dart';
 import 'stat_screen.dart';
 
-// 헤더 버튼 연결용 임포트
 import 'profile_screen.dart';
 import 'notification_screen.dart';
 import 'setting_screen.dart';
@@ -24,15 +20,13 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
 
-  // 탭별 화면 리스트
   final List<Widget> _pages = [
-    const HomeScreen(),       // 0: 홈 (자체 헤더 있음 -> 앱바 숨김)
-    const AddExpenseScreen(), // 1: 지출기록 (앱바 필요)
-    const BudgetScreen(),     // 2: 예산관리 (앱바 필요)
-    const StatScreen(),       // 3: 지출현황 (앱바 필요)
+    const HomeScreen(),      
+    const AddExpenseScreen(), 
+    const BudgetScreen(),    
+    const StatScreen(),       
   ];
 
-  // 탭별 제목 리스트
   final List<String> _titles = [
     '홈', 
     '지출 기록하기', 
@@ -53,7 +47,6 @@ class _MainScreenState extends State<MainScreen> {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.background,
       
-      // ▼▼▼ [핵심 수정] 0번(홈) 탭일 때는 앱바를 없애고(null), 나머지는 공통 앱바를 보여줌 ▼▼▼
       appBar: _selectedIndex == 0 
           ? null 
           : PreferredSize(
@@ -74,7 +67,6 @@ class _MainScreenState extends State<MainScreen> {
                     elevation: 0,
                     centerTitle: true,
                     foregroundColor: Theme.of(context).colorScheme.onBackground,
-                    // 1. 왼쪽 프로필 사진 (공통, 사진 우선)
                     leading: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: GestureDetector(
@@ -91,12 +83,10 @@ class _MainScreenState extends State<MainScreen> {
                         ),
                       ),
                     ),
-                    // 2. 가운데 제목 (탭마다 다르게)
                     title: Text(
                       _titles[_selectedIndex], 
                       style: TextStyle(color: Theme.of(context).colorScheme.onBackground, fontWeight: FontWeight.bold)
                     ),
-                    // 3. 오른쪽 아이콘들 (알림, 설정)
                     actions: [
                       IconButton(
                         icon: Icon(Icons.notifications_none, color: Theme.of(context).colorScheme.onBackground),
@@ -112,7 +102,6 @@ class _MainScreenState extends State<MainScreen> {
                 },
               ),
             ),
-      // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
 
       body: _pages[_selectedIndex],
 

@@ -33,7 +33,7 @@ class MyApp extends StatelessWidget {
       brightness: Brightness.light,
     );
     final darkScheme = ColorScheme.fromSeed(
-      seedColor: const Color(0xFF8A92A6), // 차분한 블루그레이 톤
+      seedColor: const Color(0xFF8A92A6),
       brightness: Brightness.dark,
     );
 
@@ -66,8 +66,8 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
         brightness: Brightness.dark,
         colorScheme: darkScheme.copyWith(
-          surface: const Color(0xFF1E1E1F), // 일반적인 다크모드 서피스
-          background: const Color(0xFF121212), // 많이 쓰이는 다크 배경
+          surface: const Color(0xFF1E1E1F), 
+          background: const Color(0xFF121212),
         ),
         appBarTheme: AppBarTheme(
           surfaceTintColor: Colors.transparent,
@@ -88,7 +88,6 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ),
-      // ▼▼▼ 여기를 MainScreen으로 변경했습니다 ▼▼▼
       home: user == null ? const LoginScreen() : const MainScreen(),
     );
   }

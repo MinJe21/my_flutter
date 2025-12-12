@@ -16,7 +16,7 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   final _jobController = TextEditingController();
   final _picker = ImagePicker();
-  File? _imageFile; // 갤러리에서 선택한 임시 파일
+  File? _imageFile; 
   bool _isLoading = false;
 
   @override
@@ -47,7 +47,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
           onPressed: () => Navigator.pop(context),
         ),
       ),
-      // Firestore에서 내 정보(직업, 사진URL) 실시간 감시
       body: StreamBuilder<DocumentSnapshot>(
         stream: FirebaseFirestore.instance.collection('users').doc(user?.uid).snapshots(),
         builder: (context, snapshot) {
@@ -59,7 +58,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
             job = data['job'] ?? "";
             photoUrl = data['photoUrl'];
             
-            // 컨트롤러 초기값 설정 (입력 중이 아닐 때만 업데이트)
             if (_jobController.text.isEmpty && job.isNotEmpty) {
               _jobController.text = job;
             }
@@ -71,25 +69,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
               children: [
                 const SizedBox(height: 20),
 
-                // 1. 프로필 사진 (클릭 시 변경)
                 GestureDetector(
                   onTap: _pickImage,
                   child: Stack(
                     children: [
-                      // 사진 표시 원
                       CircleAvatar(
                         radius: 60,
                         backgroundColor: Colors.grey[200],
                         backgroundImage: _imageFile != null
-                            ? FileImage(_imageFile!) // 방금 갤러리에서 고른 사진
+                            ? FileImage(_imageFile!) 
                             : (photoUrl != null 
-                                ? NetworkImage(photoUrl) // DB에 저장된 사진
-                                : null), // 없으면 기본색
+                                ? NetworkImage(photoUrl) 
+                                : null), 
                         child: (_imageFile == null && photoUrl == null)
                             ? const Icon(Icons.person, size: 60, color: Colors.grey)
                             : null,
                       ),
-                      // 카메라 아이콘 (우측 하단)
                       Positioned(
                         bottom: 0,
                         right: 0,
@@ -107,16 +102,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 const SizedBox(height: 30),
 
-                // 2. 이메일 (수정 불가)
                 _buildInfoField("이메일", user?.email ?? "", isReadOnly: true),
                 const SizedBox(height: 20),
 
-                // 3. 직업 입력 (수정 가능)
                 _buildInfoField("직업 / 하는 일", "예: 대학생, 디자이너", controller: _jobController),
                 
                 const SizedBox(height: 10),
                 
-                // 정보 저장 버튼
                 Align(
                   alignment: Alignment.centerRight,
                   child: ElevatedButton(
@@ -137,7 +129,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 const Divider(),
                 const SizedBox(height: 20),
 
-                // 4. 비밀번호 변경 버튼
                 ListTile(
                   contentPadding: EdgeInsets.zero,
                   leading: Container(
@@ -152,7 +143,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 
                 const SizedBox(height: 10),
 
-                // 5. 로그아웃 버튼
                 ListTile(
                   contentPadding: EdgeInsets.zero,
                   leading: Container(
@@ -164,7 +154,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
                   onTap: () {
                     context.read<AppState>().signOut();
-                    Navigator.pop(context); // 홈 화면으로 나가면서 로그인 화면으로 전환됨
+                    Navigator.pop(context); 
                   },
                 ),
               ],
@@ -175,9 +165,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  // --- 기능 함수들 ---
-
-  // 이미지 선택 함수
   Future<void> _pickImage() async {
     try {
       final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
@@ -192,11 +179,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
-  // 프로필 저장 함수
   Future<void> _saveProfile() async {
     setState(() => _isLoading = true);
     
-    // 키보드 내리기
     FocusScope.of(context).unfocus();
 
     await context.read<AppState>().updateProfile(
@@ -209,8 +194,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     setState(() {
       _isLoading = false;
-      // 이미지는 업로드 후 URL로 보여줄 것이므로 임시 파일은 초기화해도 됨 (선택사항)
-      // _imageFile = null; 
     });
     
     if (mounted) {
@@ -218,7 +201,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
-  // 비밀번호 변경 모달창
   void _showPasswordChangeDialog(BuildContext context) {
     final passwordCtrl = TextEditingController();
     final confirmCtrl = TextEditingController();
@@ -267,12 +249,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
               if (formKey.currentState!.validate()) {
                 context.read<AppState>().changePassword(
                   passwordCtrl.text,
-                  (msg) { // 성공 시
+                  (msg) { 
                     Navigator.pop(context);
                     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
                   },
-                  (msg) { // 실패 시
-                    Navigator.pop(context); // 에러나도 창 닫고 스낵바 표시
+                  (msg) { 
+                    Navigator.pop(context); 
                     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg), backgroundColor: Colors.red));
                   },
                 );
@@ -285,7 +267,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  // 입력칸 위젯 빌더
   Widget _buildInfoField(String label, String hint, {TextEditingController? controller, bool isReadOnly = false}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
